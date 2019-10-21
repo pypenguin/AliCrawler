@@ -23,24 +23,24 @@ class PageDataParser():
     def __init__(self, bsObj):
         self.bsObj = bsObj
 
-    def item_img_parser(self):
+    def get_item_img(self):
         img = self.bsObj.find(class_="magnifier-image").attrs['src']
         print(img)
 
-    def item_title_parser(self):
+    def get_item_title(self):
         title = self.bsObj.find(class_="product-title").get_text()
         print(title)
 
-    def item_cost_parser(self):
+    def get_item_cost(self):
         cost = self.bsObj.find(class_="product-price-value").get_text()
         print(cost)
 
 #----------------------------------------Main---------------------------------------------------------------------------
 page_source = PageDataParser(bsObj)
 
-page_source.item_img_parser()
-page_source.item_title_parser()
-page_source.item_cost_parser()
+page_source.get_item_img()
+page_source.get_item_title()
+page_source.get_item_cost()
 
 driver.quit()
 #----------------------EOF----------------------------------------------------------------------------------------------
