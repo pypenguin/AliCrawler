@@ -23,24 +23,47 @@ class PageDataParser():
     def __init__(self, bsObj):
         self.bsObj = bsObj
 
-    def get_item_img(self):
+    def get_product_img(self):
         img = self.bsObj.find(class_="magnifier-image").attrs['src']
         print(img)
 
-    def get_item_title(self):
+    def get_product_title(self):
         title = self.bsObj.find(class_="product-title").get_text()
         print(title)
 
-    def get_item_cost(self):
+    def get_product_reviewer(self):
+        rating = self.bsObj.find(class_="overview-rating-average").get_text()
+        reviews = self.bsObj.find(class_="product-reviewer-reviews black-link").get_text()
+        sold = self.bsObj.find(class_="product-reviewer-sold").get_text()
+        print(rating)
+        print(reviews)
+        print(sold)
+
+    def get_product_cost(self):
         cost = self.bsObj.find(class_="product-price-value").get_text()
         print(cost)
+
+    def get_product_quantity(self):
+        quantity = self.bsObj.find(class_="product-quantity-tip").get_text()
+        print(quantity)
+
+    def get_product_shipping(self):
+        shipping_price = self.bsObj.find(class_="product-shipping-price").get_text()
+        shipping_info =self.bsObj.find(class_="product-shipping-info black-link").get_text()
+        shipping_delivery = self.bsObj.find(class_="product-shipping-delivery").get_text()
+        print(shipping_price)
+        print(shipping_info)
+        print(shipping_delivery)
 
 #----------------------------------------Main---------------------------------------------------------------------------
 page_source = PageDataParser(bsObj)
 
-page_source.get_item_img()
-page_source.get_item_title()
-page_source.get_item_cost()
+page_source.get_product_img()
+page_source.get_product_title()
+page_source.get_product_reviewer()
+page_source.get_product_cost()
+page_source.get_product_quantity()
+page_source.get_product_shipping()
 
 driver.quit()
 #----------------------EOF----------------------------------------------------------------------------------------------
