@@ -1,11 +1,14 @@
 from urllib.request import urlopen
 from urllib.request import urlretrieve
+from urllib.error import HTTPError
 from bs4 import BeautifulSoup
 from selenium.webdriver import Firefox
 from selenium.webdriver.firefox.options import Options
+from selenium.common.exceptions import WebDriverException
 from time import sleep
+from sys import exit
 
-# Data mining Aliexpress (item image, title, cost, description)
+# Data mining Aliexpress (product image, title, cost, description, comment)
 
 opts = Options()
 opts.set_headless()
@@ -15,9 +18,19 @@ driver = Firefox(options=opts)
 
 link = "https://ru.aliexpress.com/item/33060763780.html?spm=a2g01.12375326.layer-is9wlp.1.106c67d0b1MdqF&gps-id=5895473&scm=1007.20780.114778.0&scm_id=1007.20780.114778.0&scm-url=1007.20780.114778.0&pvid=cc0fa831-1a7c-45fb-9360-43ea6ca76ee0"
 
-driver.get(link)
+def badLink(link):
+    try:
+        driver.get(link)
+    except WebDriverException:
+        print("Reached error page")
+        exit()
+
+badLink(link)
+
 pageSource = driver.page_source
+
 bsObj = BeautifulSoup(pageSource, "html.parser")
+
 
 class PageDataParser():
     def __init__(self, bsObj):
@@ -49,11 +62,14 @@ class PageDataParser():
 
     def get_product_shipping(self):
         shipping_price = self.bsObj.find(class_="product-shipping-price").get_text()
-        shipping_info =self.bsObj.find(class_="product-shipping-info black-link").get_text()
+        shipping_info = self.bsObj.find(class_="product-shipping-info black-link").get_text()
         shipping_delivery = self.bsObj.find(class_="product-shipping-delivery").get_text()
         print(shipping_price)
         print(shipping_info)
         print(shipping_delivery)
+
+    def product_comment(self):
+        print("")
 
 #----------------------------------------Main---------------------------------------------------------------------------
 page_source = PageDataParser(bsObj)
