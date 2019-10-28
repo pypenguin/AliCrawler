@@ -1,3 +1,4 @@
+import os
 from urllib.request import urlopen
 from urllib.request import urlretrieve
 from urllib.error import HTTPError
@@ -5,18 +6,29 @@ from bs4 import BeautifulSoup
 from selenium.webdriver import Firefox
 from selenium.webdriver.firefox.options import Options
 from selenium.common.exceptions import WebDriverException
+from selenium.webdriver.firefox.firefox_profile import FirefoxProfile
 from time import sleep
 from sys import exit
 
 # Data mining Aliexpress (product image, title, cost, description, comment)
 
+service_args = ['--proxy=localhost:9150', '--proxy-type=socks5', ]
+
 opts = Options()
 opts.set_headless()
 assert opts.headless
 
-driver = Firefox(options=opts)
+profile = FirefoxProfile()
+profile.set_preference("network.proxy.type", 1)
+profile.set_preference("network.proxy.socks", '127.0.0.1')
+profile.set_preference("network.proxy.socks_port", 9150)
+profile.set_preference("network.proxy.socks_remote_dns", False)
+profile.update_preferences()
 
-link = "https://ru.aliexpress.com/item/33060763780.html?spm=a2g01.12375326.layer-is9wlp.1.106c67d0b1MdqF&gps-id=5895473&scm=1007.20780.114778.0&scm_id=1007.20780.114778.0&scm-url=1007.20780.114778.0&pvid=cc0fa831-1a7c-45fb-9360-43ea6ca76ee0"
+driver = Firefox(options=opts, firefox_profile=profile)
+
+
+link = "https://ru.aliexpress.com/item/4000185079408.html?spm=a2g01.ams_89713.layer-d4fop0.1.36fcBKwuBKwuIM"
 
 def badLink(link):
     try:
@@ -70,6 +82,7 @@ class PageDataParser():
 
     def product_comment(self):
         print("")
+
 
 #----------------------------------------Main---------------------------------------------------------------------------
 page_source = PageDataParser(bsObj)
