@@ -9,8 +9,21 @@ from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.firefox.firefox_profile import FirefoxProfile
 from time import sleep
 from sys import exit
+import yaml
 
 # Data mining Aliexpress (product image, title, cost, description, comment)
+
+# load file configuration
+try:
+    config = yaml.load(open('config.conf'))
+except IOError:
+    print("!!! Error: can't read file configuration config.conf")
+    exit()
+
+# open tor browser
+startTor = (os.popen('../tor-browser_ru/Browser/start-tor-browser'))
+print('run tor browser wait 5 sec')
+sleep(5)
 
 service_args = ['--proxy=localhost:9150', '--proxy-type=socks5', ]
 
@@ -27,8 +40,7 @@ profile.update_preferences()
 
 driver = Firefox(options=opts, firefox_profile=profile)
 
-
-link = "https://ru.aliexpress.com/item/4000185079408.html?spm=a2g01.ams_89713.layer-d4fop0.1.36fcBKwuBKwuIM"
+link = config['path_link']
 
 def badLink(link):
     try:
@@ -85,8 +97,8 @@ class PageDataParser():
 
 
 #----------------------------------------Main---------------------------------------------------------------------------
+sleep(15)
 page_source = PageDataParser(bsObj)
-
 page_source.get_product_img()
 page_source.get_product_title()
 page_source.get_product_reviewer()
