@@ -8,11 +8,24 @@ from selenium.webdriver import Firefox
 from selenium.webdriver.firefox.options import Options
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.firefox.firefox_profile import FirefoxProfile
-from time import sleep
+from time import sleep, time
 from sys import exit
 import yaml
+from argparse import ArgumentParser
+import csv
 
 # Data mining Aliexpress (product image, title, cost, description, comment)
+
+start_time = time()
+
+args_pars = ArgumentParser(description="Output data parser text in console and to send email")
+args_pars.add_argument('--text', help='text - Output text in console', action='store_true', default='False')
+args_pars.add_argument('--csv', help='csv - Output text in file csv', default='False')
+args_pars.add_argument('--email', help='email - Output to send email', action='store_true', default='False')
+args = args_pars.parse_args()
+text = args.text
+csvF = args.csv
+email = args.email
 
 # load file configuration
 try:
@@ -99,13 +112,44 @@ class PageDataParser():
 
 #----------------------------------------Main---------------------------------------------------------------------------
 sleep(15)
+
 page_source = PageDataParser(bsObj)
-page_source.get_product_img()
-page_source.get_product_title()
-page_source.get_product_reviewer()
-page_source.get_product_cost()
-page_source.get_product_quantity()
-page_source.get_product_shipping()
+_product_img = page_source.get_product_img()
+_product_title = page_source.get_product_title()
+_product_reviewer = page_source.get_product_reviewer()
+_product_cost = page_source.get_product_cost()
+_product_quantity = page_source.get_product_quantity()
+_product_shipping = page_source.get_product_shipping()
+
+csvFile = open('aliexpress.txt', 'wt')
+
+def outputCsv(csvFile):
+    try:
+        writer = csv.writer(csvFile)
+        writer.writerow(('img', 'title', 'reviewer', 'cost', 'quantyty, shipping'))
+        for product_img_, product_title_, product_reviewer_, product_cost_, product_quantity_, product_shipping_ in _product_img, _product_title, _product_reviewer, _product_cost, _product_quantity, _product_shipping:
+            writer.writerow(
+                (product_img_, product_title_, product_reviewer_, product_cost_, product_quantity_, product_shipping_))
+    finally:
+        csvFile.close()
+
+outputCsv(csvFile)
+
+# Data Output text in console and to send email
+def dataOutput(text, email):
+    if text == True:
+        print(_product_img,
+        _product_title,
+        _product_reviewer,
+        _product_cost,
+        _product_quantity,
+        _product_shipping)
+    if email == True:
+        print("send to email")
+
+dataOutput(text, email)
 
 driver.quit()
+
+print("--- %s seconds ---" % (time() - start_time))
 #----------------------EOF----------------------------------------------------------------------------------------------
