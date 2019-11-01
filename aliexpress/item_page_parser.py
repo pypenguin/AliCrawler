@@ -15,17 +15,14 @@ from argparse import ArgumentParser
 import csv
 
 # Data mining Aliexpress (product image, title, cost, description, comment)
-
 start_time = time()
 
-args_pars = ArgumentParser(description="Output data parser text in console and to send email")
-args_pars.add_argument('--text', help='text - Output text in console', action='store_true', default='False')
-args_pars.add_argument('--csv', help='csv - Output text in file csv', default='False')
-args_pars.add_argument('--email', help='email - Output to send email', action='store_true', default='False')
+args_pars = ArgumentParser(description="Results in text console and csv file")
+args_pars.add_argument('--text', help='text - Results in text console', action='store_true', default='False')
+args_pars.add_argument('--csv', help='csv - Results in csv file', default='False')
 args = args_pars.parse_args()
 text = args.text
 csvF = args.csv
-email = args.email
 
 # load file configuration
 try:
@@ -76,78 +73,68 @@ class PageDataParser():
 
     def get_product_img(self):
         img = self.bsObj.find(class_="magnifier-image").attrs['src']
-        print(img)
+        return img
 
     def get_product_title(self):
         title = self.bsObj.find(class_="product-title").get_text()
-        print(title)
+        return title
 
     def get_product_reviewer(self):
         rating = self.bsObj.find(class_="overview-rating-average").get_text()
         reviews = self.bsObj.find(class_="product-reviewer-reviews black-link").get_text()
         sold = self.bsObj.find(class_="product-reviewer-sold").get_text()
-        print(rating)
-        print(reviews)
-        print(sold)
+        return rating, reviews, sold
 
     def get_product_cost(self):
         cost = self.bsObj.find(class_="product-price-value").get_text()
-        print(cost)
+        return cost
 
     def get_product_quantity(self):
         quantity = self.bsObj.find(class_="product-quantity-tip").get_text()
-        print(quantity)
+        return quantity
 
     def get_product_shipping(self):
         shipping_price = self.bsObj.find(class_="product-shipping-price").get_text()
         shipping_info = self.bsObj.find(class_="product-shipping-info black-link").get_text()
         shipping_delivery = self.bsObj.find(class_="product-shipping-delivery").get_text()
-        print(shipping_price)
-        print(shipping_info)
-        print(shipping_delivery)
+        return shipping_price, shipping_info, shipping_delivery
 
     def product_comment(self):
         print("")
 
 
 #----------------------------------------Main---------------------------------------------------------------------------
-sleep(15)
+sleep(30)
 
 page_source = PageDataParser(bsObj)
-_product_img = page_source.get_product_img()
-_product_title = page_source.get_product_title()
-_product_reviewer = page_source.get_product_reviewer()
-_product_cost = page_source.get_product_cost()
-_product_quantity = page_source.get_product_quantity()
-_product_shipping = page_source.get_product_shipping()
+productImg = page_source.get_product_img()
+productTitle = page_source.get_product_title()
+productReviewer = page_source.get_product_reviewer()
+productCost = page_source.get_product_cost()
+productQuantity = page_source.get_product_quantity()
+productShipping = page_source.get_product_shipping()
 
-csvFile = open('aliexpress.txt', 'wt')
+data_ = [productImg, productTitle, productReviewer, productCost, productQuantity, productShipping]
 
-def outputCsv(csvFile):
+
+#Results in text console and csv file
+def dataOut(text, csvF):
+    if text == True:
+        print(productImg)
+    if csvF == True:
+        outCsvFile(data_)
+dataOut(text, csvF)
+
+#Write results in csv file
+def outCsvFile(data_):
     try:
-        writer = csv.writer(csvFile)
-        writer.writerow(('img', 'title', 'reviewer', 'cost', 'quantyty, shipping'))
-        for product_img_, product_title_, product_reviewer_, product_cost_, product_quantity_, product_shipping_ in _product_img, _product_title, _product_reviewer, _product_cost, _product_quantity, _product_shipping:
-            writer.writerow(
-                (product_img_, product_title_, product_reviewer_, product_cost_, product_quantity_, product_shipping_))
+        csvFile = open('aliexpress.txt', 'wt')
+        writer = csv.writer(csvFile, delimiter='|')
+        writer.writerow(data_)
     finally:
         csvFile.close()
+outCsvFile(data_)
 
-outputCsv(csvFile)
-
-# Data Output text in console and to send email
-def dataOutput(text, email):
-    if text == True:
-        print(_product_img,
-        _product_title,
-        _product_reviewer,
-        _product_cost,
-        _product_quantity,
-        _product_shipping)
-    if email == True:
-        print("send to email")
-
-dataOutput(text, email)
 
 driver.quit()
 
